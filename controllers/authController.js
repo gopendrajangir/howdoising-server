@@ -62,7 +62,9 @@ exports.signup = catchAsync(async (req, res, next) => {
   //   'host'
   // )}/#/setPassword/${verifyToken}`;
 
-  const url = `${req.protocol}://localhost:3000/setPassword/${verifyToken}`;
+  // const url = `${req.protocol}://localhost:3000/setPassword/${verifyToken}`;
+
+  const url = `https://gopendrajangir.github.io/howdoising/#/setPassword/${verifyToken}`;
 
   await new Email(token, url).sendEmailVerification();
 
@@ -146,7 +148,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     //   'host'
     // )}/#/resetPassword/${resetToken}`;
 
-    const url = `${req.protocol}://localhost:3000/resetPassword/${resetToken}`;
+    const url = `https://gopendrajangir.github.io/howdoising/#/resetPassword/${resetToken}`;
 
     await new Email(user, url).sendPasswordReset();
     res.status(200).json({
