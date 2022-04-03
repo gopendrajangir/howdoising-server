@@ -33,9 +33,9 @@ app.use('/api/v1/static', staticRouter);
 app.use('/api/v1/questions', questionRouter);
 app.use('/api/v1/messaging', messagingRouter);
 
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'public/index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.resolve(__dirname, 'public/index.html'));
+// });
 
 app.all('*', (req, res, next) => {
   next(
