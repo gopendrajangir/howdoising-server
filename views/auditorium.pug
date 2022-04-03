@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title HowDoISing
+  body
+    each recording in recordings
+      audio(controls)
+        source(src=`/api/v1/static/recordings/${recording.recording}`, type="audio/mp3")
