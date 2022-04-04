@@ -64,7 +64,13 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   // const url = `${req.protocol}://localhost:3000/setPassword/${verifyToken}`;
 
-  const url = `https://gopendrajangir.github.io/howdoising/#/setPassword/${verifyToken}`;
+  let url;
+
+  if (process.env.NODE_ENV.trim() === 'production') {
+    url = `https://gopendrajangir.github.io/howdoising/#/setPassword/${verifyToken}`;
+  } else {
+    url = `http://localhost:3000/howdoising/#/setPassword/${verifyToken}`;
+  }
 
   await new Email(token, url).sendEmailVerification();
 
@@ -148,7 +154,13 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     //   'host'
     // )}/#/resetPassword/${resetToken}`;
 
-    const url = `https://gopendrajangir.github.io/howdoising/#/resetPassword/${resetToken}`;
+    let url;
+
+    if (process.env.NODE_ENV.trim() === 'production') {
+      url = `https://gopendrajangir.github.io/howdoising/#/resetPassword/${resetToken}`;
+    } else {
+      url = `http://localhost:8000/howdoising/#/resetPassword/${resetToken}`;
+    }
 
     await new Email(user, url).sendPasswordReset();
     res.status(200).json({
