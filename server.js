@@ -31,7 +31,15 @@ const connect = async () => {
   await server.listen(port);
   console.log(`App running on port ${port}...`);
 
-  const socket = io('http://localhost:8080');
+  let socket;
+
+  if (process.env.NODE_ENV.trim() === 'production') {
+    socket = io('https://howdoising-socket.herokuapp.com', {
+      transports: ['websocket'],
+    });
+  } else {
+    socket = io('http://localhost:8080');
+  }
 
   global.socket = socket;
   // const io = socketIO(server);
