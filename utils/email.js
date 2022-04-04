@@ -12,11 +12,19 @@ module.exports = class Email {
 
   newTransport() {
     if (process.env.NODE_ENV.trim() === 'production') {
+      // const transport = nodemailer.createTransport({
+      //   service: 'SendGrid',
+      //   auth: {
+      //     user: process.env.SENDGRID_USERNAME,
+      //     pass: process.env.SENDGRID_PASSWORD,
+      //   },
+      // });
       const transport = nodemailer.createTransport({
-        service: 'SendGrid',
+        host: 'smtp-relay.sendinblue.com',
+        port: 587,
         auth: {
-          user: process.env.SENDGRID_USERNAME,
-          pass: process.env.SENDGRID_PASSWORD,
+          user: 'howdoising0@gmail.com',
+          pass: process.env.SENDINBLUE_PASSWORD,
         },
       });
       return transport;
