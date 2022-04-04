@@ -22,7 +22,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: 'https://gopendrajangir.github.io/howdoising',
+    origin: 'https://gopendrajangir.github.io',
   })
 );
 
