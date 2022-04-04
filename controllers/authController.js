@@ -21,6 +21,7 @@ const createSendToken = (user, statusCode, req, res) => {
     ),
     httpOnly: true,
   });
+
   user.password = undefined;
   res.status(statusCode).json({
     status: 'success',
@@ -203,7 +204,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.protect = catchAsync(async (req, res, next) => {
   const token = req.cookies.jwt;
-  console.log('cookie', req.cookies);
   if (!token) {
     return next(
       new AppError('You are not logged in! Please log in to get access.', 401)
