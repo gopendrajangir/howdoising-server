@@ -20,10 +20,9 @@ module.exports = class Email {
       //   },
       // });
       const transport = nodemailer.createTransport({
-        host: 'smtp-relay.sendinblue.com',
-        port: 587,
+        service: 'SendinBlue',
         auth: {
-          user: 'howdoising0@gmail.com',
+          user: process.env.SENDGRID_USERNAME,
           pass: process.env.SENDINBLUE_PASSWORD,
         },
       });
