@@ -1,18 +1,10 @@
 extends baseEmail
 
 block content
-  h2 gopendrajangir.github.io/howdoising,
-  h4 Verify Your gopendrajangir.github.io/howdoising account
+  h2 HowDoISing,
+  h4 Verify Your howdoising account
   p Hi #{firstName},
-  p Click on the Verify Account button below to verify your account
+  p Click on the link below to verify your account
+  a(href=`${url}`, target='_blank') #{url}
   p This link is valid for only 10 minutes
-  table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
-    tbody
-      tr
-        td(align='left')
-          table(role='presentation', border='0', cellpadding='0', cellspacing='0')
-            tbody
-              tr
-                td
-                  a(href=`${url}`, target='_blank') Verify Account
-  p If you did not signup for this account your can ignore this email
+  p If you did not signup for this account your can ignore this email and we will delete your account
