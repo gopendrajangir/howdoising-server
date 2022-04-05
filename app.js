@@ -22,7 +22,10 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ['https://gopendrajangir.github.io', 'http://localhost:3000'],
+    origin: [
+      'https://gopendrajangir.github.io/howdoising',
+      'http://localhost:3000',
+    ],
     credentials: true,
   })
 );

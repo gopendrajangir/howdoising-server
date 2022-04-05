@@ -35,7 +35,7 @@ const connect = async () => {
 
   if (process.env.NODE_ENV.trim() === 'production') {
     socket = io('https://howdoising-socket.herokuapp.com', {
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
     });
   } else {
     socket = io('http://localhost:8080');
