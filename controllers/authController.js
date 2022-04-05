@@ -21,6 +21,7 @@ const createSendToken = (user, statusCode, req, res) => {
     ),
     httpOnly: true,
     sameSite: 'none',
+    secure: true,
   });
 
   user.password = undefined;
