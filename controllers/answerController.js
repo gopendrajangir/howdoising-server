@@ -58,7 +58,7 @@ exports.getAllAnswers = catchAsync(async (req, res, next) => {
 });
 
 const pushAnswerNotification = async (question, user, answer) => {
-  await User.pushNotification(question.id, {
+  await User.pushNotification(question._id, {
     answer: {
       question: {
         _id: question._id,
@@ -77,7 +77,7 @@ const pushAnswerNotification = async (question, user, answer) => {
 };
 
 exports.createAnswer = catchAsync(async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.user._id;
   const { questionId } = req.params;
   const { user } = req;
 

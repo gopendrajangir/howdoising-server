@@ -9,6 +9,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const gfs = require('../utils/gfs');
+const setId = require('../utils/setId');
 
 const error = require('./errorController');
 
@@ -55,7 +56,7 @@ exports.getAllRecordings = catchAsync(async (req, res, next) => {
         token,
         process.env.JWT_SECRET
       );
-      userId = decoded.id;
+      userId = decoded._id;
     } catch (err) {
       console.log('Its ohk');
     }
@@ -111,7 +112,7 @@ exports.createRecording = catchAsync(async (req, res, next) => {
     return next(new AppError('Recording too long', 400));
   }
 
-  const userId = req.user.id;
+  const userId = req.user._id;
   const filename = `recording-${Date.now()}.mp3`;
 
   const bucket = gfs('recordingdata');
@@ -177,6 +178,9 @@ exports.getRecording = catchAsync(async (req, res, next) => {
   if (!recording) {
     return next(new AppError('Recording not found', 404));
   }
+
+  recording.ratings = setId(recording.ratings);
+  recording.comments = setId(recording.comments);
 
   res.status(200).json({
     status: 'success',

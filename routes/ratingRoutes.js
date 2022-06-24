@@ -12,11 +12,11 @@ router
 router
   .route('/:id')
   // .get(ratingController.getRating)
-  .patch(
-    authController.protect,
-    ratingController.protectRating,
-    ratingController.updateRating
-  )
+  // .patch(
+  //   authController.protect,
+  //   ratingController.protectRating,
+  //   ratingController.updateRating
+  // )
   .delete(
     authController.protect,
     ratingController.protectRating,

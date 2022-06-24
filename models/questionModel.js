@@ -63,6 +63,7 @@ const questionSchema = new mongoose.Schema(
     toObject: {
       virtuals: true,
     },
+    versionKey: false,
   }
 );
 
@@ -78,7 +79,7 @@ questionSchema.statics.deleteQuestions = async function (user) {
       _id: { $in: user.questions.map((question) => question.voiceQuestion) },
     });
   }
-  await this.deleteMany({ user: user.id });
+  await this.deleteMany({ user: user._id });
 };
 
 questionSchema.methods.deleteQuestion = async function () {

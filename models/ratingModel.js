@@ -1,31 +1,34 @@
 const mongoose = require('mongoose');
 
-const ratingSchema = new mongoose.Schema({
-  rating: {
-    type: Number,
-    required: [true, 'Rating is required'],
-    min: 1,
-    max: 20,
+const ratingSchema = new mongoose.Schema(
+  {
+    rating: {
+      type: Number,
+      required: [true, 'Rating is required'],
+      min: 1,
+      max: 20,
+    },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: [true, 'Rating must belong to a user'],
+    },
+    recording: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Recording',
+      required: [true, 'Rating must belong to a recording'],
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  user: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: [true, 'Rating must belong to a user'],
-  },
-  recording: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Recording',
-    required: [true, 'Rating must belong to a recording'],
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { versionKey: false }
+);
 
 ratingSchema.index({ recording: 1, user: 1 }, { unique: true });
 

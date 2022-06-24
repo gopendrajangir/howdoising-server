@@ -74,24 +74,24 @@ exports.getRating = (req, res) => {
   });
 };
 
-exports.updateRating = catchAsync(async (req, res, next) => {
-  const rating = await Rating.findByIdAndUpdate(
-    req.params.id,
-    {
-      rating: req.body.rating,
-    },
-    { new: true }
-  );
+// exports.updateRating = catchAsync(async (req, res, next) => {
+//   const rating = await Rating.findByIdAndUpdate(
+//     req.params.id,
+//     {
+//       rating: req.body.rating,
+//     },
+//     { new: true }
+//   );
 
-  if (!rating) {
-    next(new AppError('Rating not found', 404));
-  }
+//   if (!rating) {
+//     next(new AppError('Rating not found', 404));
+//   }
 
-  res.status(200).json({
-    status: 'success',
-    data: { rating },
-  });
-});
+//   res.status(200).json({
+//     status: 'success',
+//     data: { rating },
+//   });
+// });
 
 exports.deleteRating = catchAsync(async (req, res, next) => {
   const { rating } = req;

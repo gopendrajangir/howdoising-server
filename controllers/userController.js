@@ -5,6 +5,7 @@ const sharp = require('sharp');
 const gfs = require('../utils/gfs');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const setId = require('../utils/setId');
 
 const User = require('../models/userModel');
 const Recording = require('../models/recordingModel');
@@ -93,56 +94,105 @@ exports.getUser = catchAsync(async (req, res, next) => {
     return next(new AppError('User not found', 404));
   }
 
+  user.passwordResetExpires = undefined;
+  user.passwordResetToken = undefined;
+
   res.status(200).json({
     status: 'success',
-    data: { user },
+    data: user,
   });
 });
 
 exports.me = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user.id)
-    .populate({
-      path: 'recordings',
-      select: 'title description',
-    })
+  const userId = req.user._id;
+  const user = await User.findById(userId)
     .populate({
       path: 'ratings',
-      select: 'rating recording',
-      populate: {
-        path: 'recording',
-        select: 'title description',
-        populate: {
+      select: 'rating user recording updatedAt',
+      populate: [
+        {
+          path: 'recording',
+          select: 'title description',
+          populate: {
+            path: 'user',
+            select: 'name photo',
+          },
+        },
+        {
           path: 'user',
           select: 'name photo',
         },
-      },
+      ],
     })
     .populate({
       path: 'comments',
-      select: 'textComment voiceComment',
-      populate: {
-        path: 'recording',
-        select: 'title description',
-        populate: {
+      select: 'textComment voiceComment createdAt',
+      populate: [
+        {
+          path: 'recording',
+          select: 'title description',
+          populate: {
+            path: 'user',
+            select: 'name photo',
+          },
+        },
+        {
           path: 'user',
           select: 'name photo',
         },
-      },
-    })
-    .populate({
-      path: 'questions',
-      select: 'title textQuestion voiceQuestion',
-    })
-    .populate({
-      path: 'answers',
-      select: 'textAnswer voiceAnswer',
+      ],
     });
+  // .populate({
+  //   path: 'questions',
+  //   select: 'title textQuestion voiceQuestion',
+  // })
+  // .populate({
+  //   path: 'answers',
+  //   select: 'textAnswer voiceAnswer',
+  // });
+
+  user.passwordResetExpires = undefined;
+  user.passwordResetToken = undefined;
+
+  const userRecordings = await Recording.find({ user: userId })
+    .populate({
+      path: 'user',
+      select: 'name photo',
+    })
+    .populate({
+      path: 'ratings',
+      select: 'rating user',
+      match: { user: userId },
+    })
+    .populate({
+      path: 'comments',
+      select: 'user',
+      match: { user: userId },
+    });
+
+  const recordings = userRecordings.map((recording) => {
+    recording = recording.toObject();
+
+    recording.userRated = recording.ratings.length
+      ? recording.ratings[0].rating
+      : false;
+    recording.userCommented = recording.comments.length ? true : false;
+
+    delete recording.ratings;
+    delete recording.comments;
+    return recording;
+  });
+
+  user.recordings = recordings;
+  user.notifications = undefined;
+  user.unreadNotifications = undefined;
+
+  user.ratings = setId(user.ratings);
+  user.comments = setId(user.comments);
 
   res.status(200).json({
     status: 'success',
-    data: {
-      user,
-    },
+    data: user,
   });
 });
 
@@ -156,15 +206,18 @@ const filterObj = (obj, allowedFields) => {
   return newObj;
 };
 
-const updateAndSendResponse = async (id, filteredBody, res) => {
-  const user = await User.findByIdAndUpdate(id, filteredBody, {
+const updateAndSendResponse = async (_id, filteredBody, res) => {
+  const user = await User.findByIdAndUpdate(_id, filteredBody, {
     new: true,
     runValidators: true,
   });
 
+  user.passwordResetExpires = undefined;
+  user.passwordResetToken = undefined;
+
   res.status(200).json({
     status: 'success',
-    data: { user },
+    data: user,
   });
 };
 
@@ -181,7 +234,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   const filteredBody = filterObj(req.body, ['name']);
 
   if (req.file) {
-    req.filename = `user-${req.user.id}-${new Date()}.jpeg`;
+    req.filename = `user-${req.user._id}-${new Date()}.jpeg`;
 
     const outputBuffer = await sharp(req.file.buffer)
       .resize(500, 500)
@@ -206,22 +259,22 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       if (!Object.keys(filteredBody).length) {
         next(new AppError('Error while uploading photo', 401));
       } else {
-        updateAndSendResponse(req.user.id, filteredBody, res);
+        updateAndSendResponse(req.user._id, filteredBody, res);
       }
     });
 
     uploadStream.on('finish', (file) => {
       filteredBody.photo = file._id;
-      updateAndSendResponse(req.user.id, filteredBody, res);
+      updateAndSendResponse(req.user._id, filteredBody, res);
     });
   } else {
-    updateAndSendResponse(req.user.id, filteredBody, res);
+    updateAndSendResponse(req.user._id, filteredBody, res);
   }
 });
 
 exports.updateMyPassword = catchAsync(async (req, res, next) => {
   const { password, newPassword, newPasswordConfirm } = req.body;
-  const user = await User.findById(req.user.id).select('+password');
+  const user = await User.findById(req.user._id).select('+password');
 
   if (
     !password ||
@@ -240,13 +293,13 @@ exports.updateMyPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
-  const { id } = req.user;
+  const { _id } = req.user;
 
-  await User.findByIdAndUpdate(id, { active: false });
+  await User.findByIdAndUpdate(_id, { active: false });
 
   await Recording.findOneAndUpdate(
     {
-      user: id,
+      user: _id,
     },
     {
       active: false,
@@ -255,7 +308,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 
   await Question.findOneAndUpdate(
     {
-      user: id,
+      user: _id,
     },
     {
       active: false,
@@ -271,6 +324,9 @@ exports.readAllNotifications = catchAsync(async (req, res, next) => {
   user.unreadNotifications = 0;
 
   const updatedUser = await user.save({ validateBeforeSave: false });
+
+  updatedUser.passwordResetExpires = undefined;
+  updatedUser.passwordResetToken = undefined;
 
   res.status(200).json({
     status: 'success',

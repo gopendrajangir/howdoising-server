@@ -35,14 +35,7 @@ const answerSchema = new mongoose.Schema(
       ref: 'Answer',
     },
   },
-  {
-    toJSON: {
-      virtuals: true,
-    },
-    toObject: {
-      virtuals: true,
-    },
-  }
+  { versionKey: false }
 );
 
 answerSchema.statics.countAnswers = async function (questionId) {
@@ -91,7 +84,7 @@ answerSchema.statics.deleteAnswers = async function (question) {
       _id: { $in: question.answers.map((answer) => answer.voiceAnswer) },
     });
   }
-  await this.deleteMany({ question: question.id });
+  await this.deleteMany({ question: question._id });
 };
 
 answerSchema.methods.deleteAnswer = async function () {

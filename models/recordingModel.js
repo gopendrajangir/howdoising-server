@@ -67,6 +67,7 @@ const recordingSchema = new mongoose.Schema(
     toObject: {
       virtuals: true,
     },
+    versionKey: false,
   }
 );
 
@@ -91,19 +92,23 @@ recordingSchema.statics.deleteRecordings = async function (user) {
   await mongoose.connection.db.collection('recordingdata.files').deleteMany({
     _id: { $in: user.recordings.map((recording) => recording.recording) },
   });
-  await this.deleteMany({ user: user.id });
+  await this.deleteMany({ user: user._id });
   await Comment.deleteComments(this);
-  await Rating.deleteMany({ recording: this.id });
+  await Rating.deleteMany({ recording: this._id });
 };
 
 recordingSchema.methods.deleteRecording = async function () {
   const bucket = gfs('recordingdata');
 
-  await bucket.delete(this.recording);
+  const cursor = await bucket.find({ _id: this.recording });
+
+  if (await cursor.next()) {
+    await bucket.delete(this.recording);
+  }
 
   await this.deleteOne();
   await Comment.deleteComments(this);
-  await Rating.deleteMany({ recording: this.id });
+  await Rating.deleteMany({ recording: this._id });
 };
 
 const Recording = mongoose.model('Recording', recordingSchema);

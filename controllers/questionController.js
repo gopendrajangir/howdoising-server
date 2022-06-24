@@ -55,7 +55,7 @@ const saveQuestion = async (req, res, next, questionData) => {
 };
 
 exports.createQuestion = catchAsync(async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.user._id;
 
   const { title, textQuestion } = req.body;
   const questionData = { title, user: userId };
@@ -132,7 +132,7 @@ exports.updateQuestion = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteQuestion = catchAsync(async (req, res, next) => {
-  const question = await Question.findById(req.question.id)
+  const question = await Question.findById(req.question._id)
     .populate({
       path: 'user',
       select: 'name photo',

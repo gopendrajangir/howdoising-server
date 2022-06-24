@@ -51,7 +51,7 @@ const pushCommentNotification = async (recording, user, comment) => {
         photo: user.photo,
       },
       textComment: comment.textComment,
-      voiceComment: comment.voiceComment ? true : false,
+      voiceComment: comment.voiceComment,
     },
   });
   global.socket.emit('notify', recording.user);
@@ -59,7 +59,7 @@ const pushCommentNotification = async (recording, user, comment) => {
 
 exports.createComment = catchAsync(async (req, res, next) => {
   const { recordingId } = req.params;
-  const userId = req.user.id;
+  const userId = req.user._id;
   const { user } = req;
   const recording = await Recording.findById(recordingId);
 
