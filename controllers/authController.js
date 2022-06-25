@@ -245,6 +245,9 @@ exports.loginWithCookie = catchAsync(async (req, res, next) => {
 
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
+  console.log(decoded._id);
+  console.log(typeof decoded._id);
+
   const currentUser = await User.findById(decoded._id);
 
   if (!currentUser) {
