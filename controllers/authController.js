@@ -28,7 +28,7 @@ const createSendToken = (user, statusCode, req, res) => {
   user.passwordResetExpires = undefined;
   user.passwordResetToken = undefined;
 
-  res.status(statusCode).json({
+  return res.status(statusCode).json({
     status: 'success',
     token,
     data: user,
@@ -235,7 +235,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.loginWithCookie = catchAsync(async (req, res, next) => {
+exports.loginWithCookie = catchAsync(async (req, res) => {
   const token = req.cookies.jwt;
   if (!token) {
     return next(
@@ -244,9 +244,6 @@ exports.loginWithCookie = catchAsync(async (req, res, next) => {
   }
 
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-  console.log(decoded._id);
-  console.log(typeof decoded._id);
 
   const currentUser = await User.findById(decoded._id);
 
