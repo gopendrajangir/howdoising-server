@@ -54,7 +54,6 @@ module.exports = class Email {
       text: htmlToText.htmlToText(html),
     };
 
-    console.log(mailOptions);
     await this.newTransport().sendMail(mailOptions);
   }
 
